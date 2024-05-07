@@ -1,16 +1,18 @@
 #!/usr/bin/python3
-"""Function to count words in all hot posts of a given Reddit subreddit."""
+"""
+This module prints sorted count of given keywords
+"""
 import requests
 
 
-def count_words(subreddit, word_list, counts={}, after):
-    """ 
+def count_words(subreddit, word_list, counts={}, after=""):
+    """
         Recursive function to query Reddit API for given subreddit
         Prints sorted count of given keywords
     """
     url = "https://api.reddit.com/r/{}?sort=hot".format(subreddit)
     if after:
-        url = "{}&after={}".format(irl, after)
+        url = "{}&after={}".format(url, after)
     headers = {'User-Agent': 'CustomClient/1.0'}
     r = requests.get(url, headers=headers, allow_redirects=False)
     if r.status_code != 200:
@@ -28,12 +30,12 @@ def count_words(subreddit, word_list, counts={}, after):
                         counts[word] += 1
                     else:
                         counts[word] = 1
-            if not data.get('after'):
-                print_counts(counts)
-            else:
-                count_words(subreddit, word_list, counts, data.get('after'))
-        else:
+        if not data.get('after'):
             print_counts(counts)
+        else:
+            count_words(subreddit, word_list, counts, data.get('after'))
+    else:
+        print_counts(counts)
 
 
 def print_counts(counts):
